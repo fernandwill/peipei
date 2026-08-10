@@ -1,6 +1,9 @@
 # --- All markdown files are intentionally untracked ---
 *.md
 
+# --- Daily task logs ---
+task/
+
 # --- Java / Maven ---
 target/
 *.class
