@@ -1,0 +1,16 @@
+# Normalize line endings across Windows dev machines and Linux CI.
+* text=auto
+
+# Shell scripts and configs must stay LF (CRLF breaks bash on CI).
+*.sh text eol=lf
+mvnw text eol=lf
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.properties text eol=lf
+*.sql text eol=lf
+
+# Windows cmd scripts.
+*.cmd text eol=crlf

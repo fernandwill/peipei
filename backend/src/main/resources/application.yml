@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: peipei-gateway
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/peipei}
+    username: ${DATABASE_USERNAME:peipei}
+    password: ${DATABASE_PASSWORD:peipei}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# Secrets: the defaults below are for LOCAL DEVELOPMENT ONLY. Every non-dev environment
+# MUST set the matching env vars (§36) — see .env.example and compose.yaml.
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-jwt-secret-change-me}
+    refresh-secret: ${JWT_REFRESH_SECRET:dev-only-jwt-refresh-secret-change-me}
+  api-key:
+    hash-pepper: ${API_KEY_HASH_PEPPER:dev-only-api-key-pepper-change-me}
+  webhook:
+    signing-secret: ${WEBHOOK_SIGNING_SECRET:dev-only-webhook-signing-secret-change-me}
+
+logging:
+  config: classpath:logback-spring.xml

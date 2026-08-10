@@ -1,0 +1,26 @@
+# --- All markdown files are intentionally untracked ---
+*.md
+
+# --- Java / Maven ---
+target/
+*.class
+*.log
+!.mvn/wrapper/maven-wrapper.jar
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# --- Environment / secrets (never commit) ---
+.env
+.env.local
+.env.*.local
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

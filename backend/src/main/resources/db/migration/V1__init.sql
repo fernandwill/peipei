@@ -1,0 +1,5 @@
+-- V1: scaffold placeholder.
+-- The real schema (users, merchants, api_keys, customers, payments, payment_attempts,
+-- refunds, webhook_events, webhook_endpoints, webhook_deliveries, idempotency_keys,
+-- audit_logs, refresh_tokens) is introduced step-by-step per §38 of the spec,
+-- starting with the users table in dev step 3.
