@@ -1,15 +1,12 @@
 import {
   Banknote,
-  CheckCircle2,
   Gauge,
   KeyRound,
   Layers,
-  ReceiptText,
   RefreshCcw,
   Settings,
   Users,
   Webhook,
-  XCircle,
 } from "lucide-react";
 
 const navigation = [
@@ -23,15 +20,15 @@ const navigation = [
   { name: "Settings", icon: Settings },
 ];
 
-const stats = [
-  { name: "Total Volume", icon: Banknote },
-  { name: "Successful Payments", icon: CheckCircle2 },
-  { name: "Failed Payments", icon: XCircle },
-  { name: "Refunds", icon: RefreshCcw },
-  { name: "Success Rate", icon: Gauge },
-];
-
-export default function DashboardPage() {
+/**
+ * Static shell shared by every dashboard route. Rendered once (prerendered with PPR),
+ * never re-rendered on navigation, and streamed instantly while route content loads.
+ */
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
       {/* Sidebar */}
@@ -74,50 +71,16 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Content column — each route streams its own HTML into {children} */}
       <div className="flex-1 overflow-y-auto">
         <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div>
-              <h1 className="text-lg font-semibold text-slate-900">Dashboard</h1>
-              <p className="text-sm text-slate-500">Overview of your gateway activity</p>
-            </div>
+          <div className="flex items-center justify-end px-8 py-4">
             <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
               Sandbox mode
             </span>
           </div>
         </header>
-
-        <main className="space-y-6 px-8 py-6">
-          {/* Stat cards — §35 */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-            {stats.map((stat) => (
-              <div
-                key={stat.name}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    {stat.name}
-                  </span>
-                  <stat.icon className="h-4 w-4 text-slate-400" />
-                </div>
-                <div className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">—</div>
-                <div className="mt-1 text-xs text-slate-400">Awaiting API connection</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Recent activity placeholder */}
-          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <ReceiptText className="mx-auto h-10 w-10 text-slate-300" />
-            <h2 className="mt-4 text-sm font-semibold text-slate-700">No payments yet</h2>
-            <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">
-              Once the backend API is connected, payments, refunds, and webhook deliveries will
-              appear here.
-            </p>
-          </div>
-        </main>
+        {children}
       </div>
     </div>
   );
