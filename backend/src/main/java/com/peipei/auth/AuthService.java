@@ -2,6 +2,7 @@ package com.peipei.auth;
 
 import com.peipei.common.ApiException;
 import com.peipei.common.ErrorCode;
+import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,27 @@ public class AuthService {
             throw new ApiException(ErrorCode.UNAUTHORIZED, "Invalid email or password");
         }
         return issueTokens(user);
+    }
+
+    /**
+     * Rotates the refresh token: the presented token is single-use, so it is deleted and a new
+     * pair is issued for the same user.
+     */
+    @Transactional
+    public AuthResponse refresh(RefreshRequest request) {
+        final Long userId;
+        try {
+            userId = jwtService.parseRefreshTokenSubject(request.refreshToken());
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new ApiException(ErrorCode.UNAUTHORIZED, "Invalid or expired refresh token");
+        }
+        // Atomically claim the session: the SELECT ... FOR UPDATE serializes concurrent replays
+        // of the same token, so only one request can rotate it (the other finds nothing).
+        RefreshToken stored = refreshTokens.findByTokenHashForUpdate(hash(request.refreshToken()))
+                .filter(token -> !token.isExpired() && token.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ApiException(ErrorCode.UNAUTHORIZED, "Invalid or expired refresh token"));
+        refreshTokens.delete(stored);
+        return issueTokens(stored.getUser());
     }
 
     private AuthResponse issueTokens(User user) {
