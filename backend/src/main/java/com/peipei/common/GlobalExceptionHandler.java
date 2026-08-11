@@ -30,6 +30,11 @@ public class GlobalExceptionHandler {
         return error(ErrorCode.VALIDATION_ERROR, "Malformed request body");
     }
 
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiError> handleApiException(ApiException ex) {
+        return error(ex.getCode(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleUnexpected(Exception ex) {
         log.error("Unhandled exception", ex);

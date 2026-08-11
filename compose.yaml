@@ -53,7 +53,8 @@ services:
       RABBITMQ_PORT: "5672"
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
-      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-change-me}
+      # >= 32 chars each so HS256 (RFC 7518) accepts the dev defaults.
+      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-only-jwt-refresh-secret-change-me}
       API_KEY_HASH_PEPPER: ${API_KEY_HASH_PEPPER:-dev-only-api-key-pepper-change-me}
       WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-dev-only-webhook-signing-secret-change-me}

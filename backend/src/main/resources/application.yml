@@ -38,8 +38,11 @@ management:
 # MUST set the matching env vars (§36) — see .env.example and compose.yaml.
 app:
   jwt:
-    secret: ${JWT_SECRET:dev-only-jwt-secret-change-me}
+    # Dev-only defaults: >= 32 chars so HS256 (RFC 7518) accepts them.
+    secret: ${JWT_SECRET:dev-only-jwt-access-secret-change-me}
     refresh-secret: ${JWT_REFRESH_SECRET:dev-only-jwt-refresh-secret-change-me}
+    access-ttl: ${JWT_ACCESS_TTL:15m}
+    refresh-ttl: ${JWT_REFRESH_TTL:30d}
   api-key:
     hash-pepper: ${API_KEY_HASH_PEPPER:dev-only-api-key-pepper-change-me}
   webhook:
