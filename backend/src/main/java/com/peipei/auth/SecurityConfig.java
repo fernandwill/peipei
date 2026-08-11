@@ -1,7 +1,6 @@
 package com.peipei.auth;
 
 import com.peipei.common.ApiError;
-import tools.jackson.databind.ObjectMapper;
 import com.peipei.common.ErrorCode;
 import com.peipei.common.RequestIdContext;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +19,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Security configuration (dev steps 3-5, §26): JWT bearer auth for the dashboard and API,

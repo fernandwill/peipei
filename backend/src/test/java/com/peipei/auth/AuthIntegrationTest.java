@@ -1,26 +1,26 @@
 package com.peipei.auth;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +39,7 @@ class AuthIntegrationTest {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16-alpine");
 
     @Container
     @ServiceConnection
@@ -71,8 +71,8 @@ class AuthIntegrationTest {
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andReturn();
         JsonNode registered = objectMapper.readTree(register.getResponse().getContentAsString());
-        String access = registered.get("accessToken").asText();
-        String refresh = registered.get("refreshToken").asText();
+        String access = registered.get("accessToken").asString();
+        String refresh = registered.get("refreshToken").asString();
 
         // me with the access token
         mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + access))
@@ -94,7 +94,7 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andReturn();
-        String refresh2 = objectMapper.readTree(login.getResponse().getContentAsString()).get("refreshToken").asText();
+        String refresh2 = objectMapper.readTree(login.getResponse().getContentAsString()).get("refreshToken").asString();
 
         // refresh rotates the token: new pair, old refresh token becomes single-use
         MvcResult refreshed = mockMvc.perform(post("/api/auth/refresh")
@@ -103,7 +103,7 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andReturn();
-        String refresh3 = objectMapper.readTree(refreshed.getResponse().getContentAsString()).get("refreshToken").asText();
+        String refresh3 = objectMapper.readTree(refreshed.getResponse().getContentAsString()).get("refreshToken").asString();
         assertThat(refresh3).isNotEqualTo(refresh2);
 
         mockMvc.perform(post("/api/auth/refresh")
@@ -169,8 +169,8 @@ class AuthIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
         JsonNode body = objectMapper.readTree(register.getResponse().getContentAsString());
-        String access = body.get("accessToken").asText();
-        String refresh = body.get("refreshToken").asText();
+        String access = body.get("accessToken").asString();
+        String refresh = body.get("refreshToken").asString();
 
         // an access token must not be usable at /refresh
         mockMvc.perform(post("/api/auth/refresh")
