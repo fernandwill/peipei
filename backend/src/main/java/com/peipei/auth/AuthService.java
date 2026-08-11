@@ -55,6 +55,21 @@ public class AuthService {
         return issueTokens(user);
     }
 
+    @Transactional
+    public AuthResponse login(LoginRequest request) {
+        String email = normalizeEmail(request.email());
+        User user = users.findByEmail(email).orElse(null);
+        if (user == null) {
+            // Burn a BCrypt match so unknown accounts take as long as real ones (anti-enumeration).
+            passwordEncoder.matches(request.password(), dummyPasswordHash);
+            throw new ApiException(ErrorCode.UNAUTHORIZED, "Invalid email or password");
+        }
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new ApiException(ErrorCode.UNAUTHORIZED, "Invalid email or password");
+        }
+        return issueTokens(user);
+    }
+
     private AuthResponse issueTokens(User user) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
